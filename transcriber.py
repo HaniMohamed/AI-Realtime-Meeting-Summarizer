@@ -8,7 +8,7 @@ def transcribe_file_whisper(model, wav_path):
     segments, _ = model.transcribe(wav_path, beam_size=5, language="en")
     return [{"start": float(seg.start), "end": float(seg.end), "text": seg.text.strip()} for seg in segments]
 
-def transcriber(audio_queue, transcript_queue, model, mic_channel, meeting_start):
+def transcriber(audio_queue, transcript_queue, model, mic_channel, meeting_start, stop_event):
     while True:
         wav_path, chunk_start, audio = audio_queue.get()
         try:
@@ -46,3 +46,5 @@ def transcriber(audio_queue, transcript_queue, model, mic_channel, meeting_start
             print(f"[{entry['time']} - {speaker}] {entry['text']}")
 
         audio_queue.task_done()
+        if stop_event.is_set():
+            break  # exit thread

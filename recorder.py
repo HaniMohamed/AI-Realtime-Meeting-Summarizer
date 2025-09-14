@@ -5,7 +5,7 @@ import sounddevice as sd
 import soundfile as sf
 import time
 
-def recorder(audio_queue, device_id, samplerate, channels, chunk_duration):
+def recorder(audio_queue, device_id, samplerate, channels, chunk_duration, stop_event):
     frames = int(chunk_duration * samplerate)
     chunk_index = 0
     while True:
@@ -18,3 +18,5 @@ def recorder(audio_queue, device_id, samplerate, channels, chunk_duration):
         sf.write(tmpf.name, audio, samplerate)
         audio_queue.put((tmpf.name, time.time(), audio))
         print(f"[recorder] queued chunk {chunk_index}")
+        if stop_event.is_set():
+            break  # exit thread

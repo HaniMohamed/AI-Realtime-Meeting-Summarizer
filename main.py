@@ -40,10 +40,13 @@ def run_meeting(device_id, chunk_duration, summary_interval, whisper_model_name,
     transcript_queue = queue.Queue()
     transcript_list = []
 
+    stop_event = threading.Event()  # Event to signal threads to stop
+
+
     # Threads
-    threading.Thread(target=recorder, args=(audio_queue, device_id, samplerate, channels, chunk_duration), daemon=True).start()
-    threading.Thread(target=transcriber, args=(audio_queue, transcript_queue, model, mic_channel, meeting_start), daemon=True).start()
-    threading.Thread(target=summarizer, args=(transcript_queue, summary_path, ollama_model, summary_interval), daemon=True).start()
+    threading.Thread(target=recorder, args=(audio_queue, device_id, samplerate, channels, chunk_duration, stop_event), daemon=True).start()
+    threading.Thread(target=transcriber, args=(audio_queue, transcript_queue, model, mic_channel, meeting_start, stop_event), daemon=True).start()
+    threading.Thread(target=summarizer, args=(transcript_queue, summary_path, ollama_model, summary_interval, stop_event), daemon=True).start()
 
     try:
         while True:
@@ -56,6 +59,10 @@ def run_meeting(device_id, chunk_duration, summary_interval, whisper_model_name,
             time.sleep(0.1)
     except KeyboardInterrupt:
         print("\nStopping... Saving final transcript.")
+        # Signal threads to stop
+        stop_event.set()
+        # Give threads a moment to finish
+        time.sleep(1)
         with open(out_json_path, "w", encoding="utf-8") as fh:
             json.dump({"meeting_start": meeting_start, "segments": transcript_list}, fh, ensure_ascii=False, indent=2)
         print(f"Transcript saved to {out_json_path}")

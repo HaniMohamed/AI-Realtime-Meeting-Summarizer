@@ -15,7 +15,7 @@ def ollama_summarize(ollama_model: str, prompt_text: str) -> str:
         print("Ollama call failed:", e)
         return ""
 
-def summarizer(transcript_queue, summary_path, ollama_model, summary_interval):
+def summarizer(transcript_queue, summary_path, ollama_model, summary_interval, stop_event):
     buffer = []
     last_time = time.time()
     while True:
@@ -23,6 +23,8 @@ def summarizer(transcript_queue, summary_path, ollama_model, summary_interval):
             entry = transcript_queue.get(timeout=1)
             buffer.append(entry["text"])
             transcript_queue.task_done()
+            if stop_event.is_set():
+                break  # exit thread
         except queue.Empty:
             pass
 
