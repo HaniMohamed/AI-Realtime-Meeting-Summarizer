@@ -2,7 +2,7 @@
 
 import os
 import numpy as np
-from .utils import pretty_time
+from utils import pretty_time
 
 def transcribe_file_whisper(model, wav_path):
     segments, _ = model.transcribe(wav_path, beam_size=5, language="en")

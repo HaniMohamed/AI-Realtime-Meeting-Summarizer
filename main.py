@@ -9,11 +9,11 @@ from pathlib import Path
 import sounddevice as sd
 from faster_whisper import WhisperModel
 
-from . import config
-from .utils import list_input_devices, create_results_folder, calibrate_mic
-from .recorder import recorder
-from .transcriber import transcriber
-from .summarizer import summarizer, finalSummarizer
+import config
+from utils import list_input_devices, create_results_folder, calibrate_mic
+from recorder import recorder
+from transcriber import transcriber
+from summarizer import summarizer, finalSummarizer
 
 def run_meeting(device_id, chunk_duration, summary_interval, whisper_model_name,
                 ollama_model, use_gpu, output_folder):
