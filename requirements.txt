@@ -3,3 +3,4 @@ soundfile
 numpy
 whisper
 ollama
+psutil

@@ -16,7 +16,8 @@ def recorder(audio_queue, device_id, samplerate, channels, chunk_duration, stop_
 
         tmpf = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
         sf.write(tmpf.name, audio, samplerate)
-        audio_queue.put((tmpf.name, time.time(), audio))
-        print(f"[recorder] queued chunk {chunk_index}")
         if stop_event.is_set():
             break  # exit thread
+        audio_queue.put((tmpf.name, time.time(), audio))
+        print(f"[recorder] queued chunk {chunk_index}")
+

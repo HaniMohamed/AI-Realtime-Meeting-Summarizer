@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 import sounddevice as sd
 from faster_whisper import WhisperModel
+import psutil
+
 
 import config
 from utils import list_input_devices, create_results_folder, calibrate_mic
@@ -36,8 +38,8 @@ def run_meeting(device_id, chunk_duration, summary_interval, whisper_model_name,
     summary_path = f"{folder_path}/meeting_summary_{int(meeting_start)}.txt"
     out_json_path = f"{folder_path}/meeting_transcript_{int(meeting_start)}.json"
 
-    audio_queue = queue.Queue()
-    transcript_queue = queue.Queue()
+    audio_queue = queue.Queue(maxsize=10)
+    transcript_queue = queue.Queue(maxsize=100)
     transcript_list = []
 
     stop_event = threading.Event()  # Event to signal threads to stop
@@ -50,6 +52,7 @@ def run_meeting(device_id, chunk_duration, summary_interval, whisper_model_name,
 
     try:
         while True:
+            log_memory()
             try:
                 entry = transcript_queue.get(timeout=1)
                 transcript_list.append(entry)
@@ -68,6 +71,10 @@ def run_meeting(device_id, chunk_duration, summary_interval, whisper_model_name,
         print(f"Transcript saved to {out_json_path}")
         all_text = "\n".join([t['text'] for t in transcript_list])
         finalSummarizer(all_text, summary_path, ollama_model)
+
+
+def log_memory():
+    print(f"Memory usage: {psutil.Process().memory_info().rss / 1024 ** 2:.2f} MB")
 
 def main():
     parser = argparse.ArgumentParser()

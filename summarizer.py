@@ -45,6 +45,7 @@ def summarizer(transcript_queue, summary_path, ollama_model, summary_interval, s
             last_time = now
 
 def finalSummarizer(all_text, summary_path, ollama_model):
+    print(f"Generating final summary ......")
     final_prompt = (
         "You are an assistant. Produce a final meeting (mainly about software features and development) summary with:\n"
         "- Short summary (3-20 lines)\n- Key points\n- Decisions\n- Action items with owners if mentioned\n\n"
