@@ -32,7 +32,7 @@ def summarizer(transcript_queue, summary_path, ollama_model, summary_interval, s
         if now - last_time >= summary_interval and buffer:
             joined = "\n".join(buffer[-50:])
             prompt = (
-                "You are an assistant. Please produce a succinct meeting summary with:\n"
+                "You are an assistant. Please produce a succinct meeting (mainly about software features and development) summary with:\n"
                 "- Key points\n- Decisions\n- Action items\n\n"
                 f"Transcript excerpt:\n{joined}\n"
             )
@@ -46,7 +46,7 @@ def summarizer(transcript_queue, summary_path, ollama_model, summary_interval, s
 
 def finalSummarizer(all_text, summary_path, ollama_model):
     final_prompt = (
-        "You are an assistant. Produce a final meeting summary with:\n"
+        "You are an assistant. Produce a final meeting (mainly about software features and development) summary with:\n"
         "- Short summary (3-20 lines)\n- Key points\n- Decisions\n- Action items with owners if mentioned\n\n"
         f"Full transcript:\n{all_text}\n\nOutput structured sections."
     )
